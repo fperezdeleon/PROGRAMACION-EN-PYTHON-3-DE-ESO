@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Chuleta de Python · 3º ESO</title><link rel="stylesheet" href="../assets/style.css"></head>
+<body data-course="3eso" data-page="chuleta">
+<header class="top"><a class="brand" href="index.html">🐍 Python 3º ESO</a>
+<a href="chuleta.html">Chuleta</a><a href="rubrica.html">Rúbrica</a>
+<div class="xpbox"><span id="xpnum">0 XP</span><div class="bar"><i id="xpbar"></i></div></div></header>
+<main><h1>📄 Chuleta de Python · 3º ESO</h1><p>Imprímela: es lo único que puedes llevar a la prueba.</p><h3>Mostrar y comentar</h3><pre><code class="language-python"># comentario
+print("Hola")
+print(f"{nombre} tiene {edad} años")</code></pre><h3>Variables y tipos</h3><pre><code class="language-python">n = 3        # int
+x = 2.5      # float
+t = "hola"   # str
+ok = True    # bool</code></pre><h3>Operadores</h3><pre><code class="language-python">+  -  *  /  //  %  **
+7 // 2 → 3    7 % 2 → 1    2 ** 3 → 8
+round(3.14159, 2) → 3.14</code></pre><h3>Pedir datos</h3><pre><code class="language-python">nombre = input("Nombre: ")
+edad = int(input("Edad: "))
+precio = float(input("Precio: "))</code></pre><h3>Condicionales</h3><pre><code class="language-python">if a &gt; b and a &gt; 0:
+    ...
+elif a == b or not (a &lt; 0):
+    ...
+else:
+    ...</code></pre><h3>Bucle for</h3><pre><code class="language-python">for i in range(1, 6): ...        # 1..5
+for i in range(10, 0, -1): ...   # 10..1
+for i in range(0, 11, 2): ...    # pares</code></pre><h3>Bucle while</h3><pre><code class="language-python">n = 10
+while n &gt; 0:
+    n = n - 3
+# ¡cambia algo dentro o será infinito!</code></pre><h3>Acumulador y contador</h3><pre><code class="language-python">suma = 0
+cuenta = 0
+for i in range(1, 11):
+    suma = suma + i
+    if i % 2 == 0:
+        cuenta = cuenta + 1</code></pre><h3>Bucles anidados</h3><pre><code class="language-python">for i in range(3):
+    for j in range(i + 1):
+        print("*", end="")
+    print()</code></pre><h3>Funciones</h3><pre><code class="language-python">def area(base, altura):
+    return base * altura
+
+print(area(3, 4))</code></pre><h3>Cadenas</h3><pre><code class="language-python">t = "Python"
+len(t)  t.upper()  t.lower()  t[0]  t[-1]  "y" in t</code></pre><h3>Errores comunes</h3><pre><code class="language-python">SyntaxError    → falta un :, una comilla o un paréntesis
+NameError      → nombre mal escrito (¿mayúsculas?)
+IndentationError → falta la sangría
+TypeError      → mezclas texto y número (¿falta int()?)</code></pre><div class="nav"><span><a href="index.html">← Inicio</a></span><span></span></div></main>
+<footer>Material para Computación y Robótica · 3º ESO · Basado en la Orden de 30 de mayo de 2023 (BOJA nº 104) · Licencia CC BY-SA<br>Tu XP se guarda solo en este navegador y no cuenta para la nota: la nota sale de los criterios.</footer>
+<div class="toast" id="toast"></div><script src="../assets/app.js"></script></body></html>

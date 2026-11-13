@@ -1,0 +1,48 @@
+:root{--bg:#0f1226;--card:#171b3a;--card2:#1e2350;--ink:#eef0ff;--mut:#a9b0e0;--acc:#7cf5c8;--acc2:#ffd166;--bad:#ff6b8b;--ok:#4cd9a0;--line:#2c3270;--code:#0a0d20}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--ink);line-height:1.6}
+a{color:var(--acc)}
+header.top{position:sticky;top:0;z-index:10;background:#0b0e20ee;backdrop-filter:blur(6px);border-bottom:1px solid var(--line);padding:.6rem 1rem;display:flex;flex-wrap:wrap;gap:.8rem;align-items:center}
+header.top .brand{font-weight:800;color:var(--acc);text-decoration:none}
+.xpbox{margin-left:auto;display:flex;gap:.6rem;align-items:center;font-size:.85rem}
+.bar{width:140px;height:10px;background:var(--code);border-radius:99px;overflow:hidden;border:1px solid var(--line)}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--acc),var(--acc2));transition:width .5s}
+main{max-width:860px;margin:0 auto;padding:1.2rem 1rem 4rem}
+h1{font-size:1.9rem;margin:.4rem 0}
+h2{margin-top:2rem;border-bottom:2px solid var(--line);padding-bottom:.2rem}
+h3{color:var(--acc2)}
+.tag{display:inline-block;background:var(--card2);border:1px solid var(--line);border-radius:99px;padding:.1rem .7rem;font-size:.8rem;margin-right:.3rem;color:var(--mut)}
+.tag.crit{color:var(--acc2);border-color:var(--acc2)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1rem 1.2rem;margin:1rem 0}
+.card.mission{border-color:var(--acc);box-shadow:0 0 0 1px #7cf5c833}
+.card.tip{border-left:5px solid var(--acc2)}
+.card.warn{border-left:5px solid var(--bad)}
+pre{background:var(--code);border:1px solid var(--line);border-radius:10px;padding:.8rem 1rem;overflow:auto;position:relative;font-size:.92rem}
+pre.out{border-style:dashed;color:var(--acc)}
+code{font-family:ui-monospace,Consolas,monospace;color:var(--acc2)}
+pre code{color:#dfe3ff}
+button.copy{position:absolute;right:.5rem;top:.5rem;background:var(--card2);color:var(--ink);border:1px solid var(--line);border-radius:8px;font-size:.75rem;cursor:pointer}
+table{border-collapse:collapse;width:100%;margin:.8rem 0;font-size:.95rem}
+th,td{border:1px solid var(--line);padding:.4rem .6rem;text-align:left;vertical-align:top}
+th{background:var(--card2)}
+.q{margin:1rem 0}
+.q .opt{display:block;width:100%;text-align:left;margin:.3rem 0;padding:.5rem .8rem;border-radius:10px;border:1px solid var(--line);background:var(--card2);color:var(--ink);cursor:pointer;font-size:.95rem}
+.q .opt:hover{border-color:var(--acc)}
+.q .opt.ok{background:#12452f;border-color:var(--ok)}
+.q .opt.ko{background:#4a1a2a;border-color:var(--bad)}
+.q .why{display:none;color:var(--mut);font-size:.9rem;margin-top:.2rem}
+.q.done .why{display:block}
+.chk label{display:block;margin:.3rem 0;cursor:pointer}
+.nav{display:flex;justify-content:space-between;gap:1rem;margin-top:2rem;flex-wrap:wrap}
+.nav a{background:var(--card2);padding:.5rem 1rem;border-radius:10px;text-decoration:none;border:1px solid var(--line)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:1rem}
+.grid a.s{display:block;text-decoration:none;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1rem}
+.grid a.s:hover{border-color:var(--acc)}
+.grid .n{font-size:.8rem;color:var(--mut)}
+.badges{display:flex;flex-wrap:wrap;gap:.5rem;margin:.5rem 0}
+.badge{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;font-size:1.4rem;background:var(--card2);border:2px solid var(--line);filter:grayscale(1) opacity(.45)}
+.badge.on{filter:none;border-color:var(--acc2);box-shadow:0 0 10px #ffd16688}
+.toast{position:fixed;bottom:1rem;right:1rem;background:var(--acc);color:#04121a;padding:.7rem 1rem;border-radius:12px;font-weight:700;display:none;z-index:20}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem}
+footer{color:var(--mut);font-size:.8rem;text-align:center;padding:2rem 1rem}
+@media print{header.top,.nav,.toast,button.copy{display:none}body{background:#fff;color:#000}.card,pre{border-color:#999;background:#fff;color:#000}code,pre code{color:#000}h3,a{color:#000}}
