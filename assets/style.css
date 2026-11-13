@@ -46,3 +46,28 @@ th{background:var(--card2)}
 .grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem}
 footer{color:var(--mut);font-size:.8rem;text-align:center;padding:2rem 1rem}
 @media print{header.top,.nav,.toast,button.copy{display:none}body{background:#fff;color:#000}.card,pre{border-color:#999;background:#fff;color:#000}code,pre code{color:#000}h3,a{color:#000}}
+
+/* ---- Guía visual de Scratch (bloques dibujados con CSS) ---- */
+.script{background:#0a0d20;border:1px solid var(--line);border-radius:12px;padding:.9rem 1rem;margin:.8rem 0;overflow:auto}
+.script .lbl{color:var(--mut);font-size:.8rem;margin-bottom:.4rem}
+.blk,.cb>.ch,.cb>.cf{color:#fff;font-weight:600;font-size:.9rem;text-shadow:0 1px 0 rgba(0,0,0,.3);font-family:system-ui,Segoe UI,Arial,sans-serif}
+.blk{display:block;width:fit-content;max-width:100%;padding:.4rem .75rem;border-radius:6px;margin:2px 0;border:1px solid rgba(0,0,0,.3);box-shadow:0 2px 0 rgba(0,0,0,.3)}
+.hat{border-radius:26px 26px 6px 6px;padding-top:.7rem}
+.rep,.bool{display:inline-block;color:#fff;font-weight:600;font-size:.85rem;padding:.05rem .65rem;border:1px solid rgba(0,0,0,.3);margin:0 .15rem;text-shadow:0 1px 0 rgba(0,0,0,.3)}
+.rep{border-radius:99px}
+.bool{border-radius:6px;clip-path:polygon(9px 0,calc(100% - 9px) 0,100% 50%,calc(100% - 9px) 100%,9px 100%,0 50%);padding:.05rem 1rem}
+.in{display:inline-block;background:#fff;color:#333;border-radius:99px;padding:0 .55rem;margin:0 .15rem;font-weight:500;text-shadow:none}
+.dd{background:rgba(0,0,0,.18);color:#fff;border-radius:6px}
+.cb{width:fit-content;max-width:100%;margin:2px 0}
+.cb>.ch{padding:.4rem .75rem;border-radius:6px 6px 0 0;border:1px solid rgba(0,0,0,.3);border-bottom:0}
+.cb>.cin{margin-left:20px;padding:2px 0 2px 0}
+.cb>.cf{height:14px;border-radius:0 0 6px 6px;border:1px solid rgba(0,0,0,.3);border-top:0;box-shadow:0 2px 0 rgba(0,0,0,.3)}
+.cb>.ch.mid{border-radius:0}
+.c-ev{background:#ffbf00}.c-ctl{background:#ffab19}.c-sen{background:#5cb1d6}.c-app{background:#9966ff}
+.c-var{background:#ff8c1a}.c-ope{background:#59c059}.c-mov{background:#4c97ff}
+.shapes td:first-child{white-space:nowrap}
+.edit-fig{width:100%;height:auto;border:1px solid var(--line);border-radius:12px;background:#0a0d20;margin:.6rem 0}
+.steps-fig{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:.8rem}
+.badge-n{display:inline-block;background:var(--acc2);color:#222;border-radius:99px;width:1.5rem;height:1.5rem;text-align:center;font-weight:700;line-height:1.5rem;margin-right:.3rem}
+.blk,.cb>.ch,.rep,.bool{white-space:nowrap}
+.flag{color:#4cd9a0;text-shadow:0 0 0 #000;font-size:1.05em}
