@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Simulador del tablero · 3º ESO</title><link rel="stylesheet" href="../assets/style.css"></head>
+<body data-course="3eso" data-page="tablero">
+<header class="top"><a class="brand" href="index.html">🐍 Python 3º ESO</a>
+<a href="chuleta.html">Chuleta</a><a href="rubrica.html">Rúbrica</a>
+<div class="xpbox"><span id="xpnum">0 XP</span><div class="bar"><i id="xpbar"></i></div></div></header>
+<main><style>
+.tb{max-width:880px}.tb .bar2{display:flex;flex-wrap:wrap;gap:.5rem;margin:.6rem 0}
+.tb button{font:inherit;padding:.45rem .8rem;border:2px solid #4c6ef5;background:#fff;color:#1c2b6b;border-radius:8px;cursor:pointer}
+.tb button:hover{background:#edf2ff}.tb button.go{background:#4c6ef5;color:#fff}.tb button.go:hover{background:#3b5bdb}
+.tb .cols{display:grid;grid-template-columns:minmax(240px,1fr) minmax(280px,1.3fr);gap:1rem;align-items:start}
+@media(max-width:700px){.tb .cols{grid-template-columns:1fr}}
+.tb textarea{width:100%;box-sizing:border-box;font-family:ui-monospace,Consolas,monospace;font-size:1rem;min-height:12rem;padding:.6rem;border:2px solid #adb5bd;border-radius:8px;tab-size:4}
+.tb select,.tb input{font:inherit;padding:.25rem .4rem;border:1px solid #adb5bd;border-radius:6px;background:#fff;color:#222}
+.tb input[type=number]{width:4.2rem}.tb .cfg{display:flex;flex-wrap:wrap;gap:.4rem .8rem;align-items:center;margin:.5rem 0}
+.tb .board{background:#fff;border:2px solid #adb5bd;border-radius:10px;padding:.4rem;overflow:auto}
+.tb .info{margin:.5rem 0;padding:.6rem .8rem;border-radius:8px;background:#f1f3f5;color:#222;min-height:2.6rem}
+.tb .info.ok{background:#d3f9d8}.tb .info.bad{background:#ffe3e3}
+</style>
+<h1>🧩 Simulador del tablero del robot</h1>
+<p>Escribe el programa del robot, pulsa <strong>Ejecutar</strong> y comprueba si has acertado. Las filas se cuentan <strong>de abajo arriba</strong> y las columnas de izquierda a derecha: la casilla <strong>(columna, fila)</strong>.</p>
+<div class="tb">
+<div class="cfg"><label>Ejercicio: <select id="preset"></select></label></div>
+<div class="cols">
+ <div>
+  <div class="bar2"><button id="b1">avanzar</button><button id="b2">girar izquierda</button><button id="b3">girar derecha</button><button id="b4">repetir…</button></div>
+  <textarea id="prog" spellcheck="false" aria-label="Programa del robot"></textarea>
+  <div class="bar2"><button class="go" id="bgo">▶ Ejecutar</button><button id="bstep">⏭ Paso a paso</button><button id="breset">↺ Reiniciar</button><button id="bclear">🗑 Borrar</button></div>
+  <p style="font-size:.9rem">Una instrucción por línea: <code>avanzar</code> (o <code>avanzar 3</code>), <code>girar izquierda</code>, <code>girar derecha</code>. Para repetir: <code>repetir 4 veces</code> y, debajo, las instrucciones con <strong>4 espacios</strong> delante (la tecla Tab los pone).</p>
+ </div>
+ <div>
+  <div class="board" id="board"></div>
+  <div class="info" id="info"></div>
+ </div>
+</div>
+<details><summary>⚙️ Cambiar el tablero</summary><div class="cfg">
+ <label>Columnas <input id="cc" type="number" min="1" max="12"></label><label>Filas <input id="cf" type="number" min="1" max="12"></label>
+ <label>Salida: columna <input id="cx" type="number" min="1" max="12"></label><label>fila <input id="cy" type="number" min="1" max="12"></label>
+ <label>mira <select id="cd"><option value="up">arriba</option><option value="right">derecha</option><option value="down">abajo</option><option value="left">izquierda</option></select></label>
+ <label>Meta ★ columna <input id="mx" type="number" min="1" max="12"></label><label>fila <input id="my" type="number" min="1" max="12"></label>
+</div></details>
+</div>
+<script>
+(function(){
+const P=[{"name": "Ejercicio 2 · Sigue el programa (repetir)", "c": 6, "f": 6, "x": 2, "y": 2, "d": "up", "meta": null, "prog": "repetir 3 veces\n    avanzar 2\n    girar derecha"}, {"name": "Reto · Llegar a la meta (5, 5)", "c": 6, "f": 6, "x": 2, "y": 2, "d": "up", "meta": [5, 5], "prog": ""}, {"name": "Tablero libre 10×10", "c": 10, "f": 10, "x": 1, "y": 1, "d": "right", "meta": null, "prog": ""}];
+const DIRS=['up','right','down','left'];
+const DN={up:'hacia arriba',right:'hacia la derecha',down:'hacia abajo',left:'hacia la izquierda'};
+const DV={up:[0,1],right:[1,0],down:[0,-1],left:[-1,0]};
+const ANG={up:0,right:90,down:180,left:270};
+const $=id=>document.getElementById(id);
+let cfg=null,states=[],cur=0,timer=null,dirty=true;
+function norm(s){return s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');}
+function parse(text){
+  const raw=text.replace(/\t/g,'    ').split('\n'),lines=[];
+  raw.forEach((l,i)=>{const t=l.trim();if(t===''||t[0]==='#')return;
+    lines.push({n:i+1,ind:l.length-l.replace(/^\s+/,'').length,t:norm(t).replace(/:$/,'').replace(/\s+/g,' ')});});
+  let idx=0;
+  function block(ind){const out=[];
+    while(idx<lines.length){const L=lines[idx];if(L.ind<ind)break;
+      if(L.ind>ind)throw new Error('Línea '+L.n+': sangría inesperada.');
+      idx++;let m;
+      if(m=L.t.match(/^avanzar(?: (\d+))?$/))out.push({k:'f',n:m[1]?+m[1]:1,line:L.n});
+      else if(m=L.t.match(/^girar (izquierda|derecha)$/))out.push({k:'t',d:m[1]==='derecha'?1:-1,line:L.n});
+      else if(m=L.t.match(/^repetir (\d+)(?: veces?)?$/)){
+        if(!(idx<lines.length&&lines[idx].ind>ind))throw new Error('Línea '+L.n+': tras «repetir» van las instrucciones con sangría (4 espacios delante).');
+        out.push({k:'r',n:+m[1],body:block(lines[idx].ind),line:L.n});}
+      else throw new Error('Línea '+L.n+': no entiendo «'+L.t+'». Usa: avanzar, girar izquierda, girar derecha o repetir N veces.');}
+    return out;}
+  const prog=block(lines.length?lines[0].ind:0);
+  if(idx<lines.length)throw new Error('Línea '+lines[idx].n+': sangría incorrecta.');
+  return prog;}
+function flat(prog,out){for(const c of prog){
+  if(c.k==='r'){for(let i=0;i<c.n;i++){flat(c.body,out);if(out.length>3000)throw new Error('El programa tiene demasiados pasos.');}}
+  else if(c.k==='f'){for(let i=0;i<c.n;i++)out.push({k:'f',line:c.line});}
+  else out.push(c);}}
+function simulate(){
+  const acts=[];flat(parse($('prog').value),acts);
+  let x=cfg.x,y=cfg.y,d=DIRS.indexOf(cfg.d);
+  const st=[{x:x,y:y,d:d,line:0,crash:false}];
+  for(const a of acts){
+    if(a.k==='t'){d=(d+a.d+4)%4;st.push({x:x,y:y,d:d,line:a.line,crash:false});}
+    else{const v=DV[DIRS[d]],nx=x+v[0],ny=y+v[1];
+      if(nx<1||nx>cfg.c||ny<1||ny>cfg.f){st.push({x:x,y:y,d:d,line:a.line,crash:true});break;}
+      x=nx;y=ny;st.push({x:x,y:y,d:d,line:a.line,crash:false});}}
+  return st;}
+const S=56,L=30,T=10;
+function cx(c){return L+(c-0.5)*S;}function cy(r){return T+(cfg.f-r+0.5)*S;}
+function draw(){
+  const W=L+cfg.c*S+10,H=T+cfg.f*S+L;let s='<svg viewBox="0 0 '+W+' '+H+'" width="'+W+'" style="max-width:100%;height:auto" role="img" aria-label="Tablero del robot">';
+  for(let c=1;c<=cfg.c;c++)for(let r=1;r<=cfg.f;r++){
+    const st=(c===cfg.x&&r===cfg.y)?'#d0ebff':'#f8f9fa';
+    s+='<rect x="'+(L+(c-1)*S)+'" y="'+(T+(cfg.f-r)*S)+'" width="'+S+'" height="'+S+'" fill="'+st+'" stroke="#adb5bd"/>';}
+  for(let c=1;c<=cfg.c;c++)s+='<text x="'+cx(c)+'" y="'+(T+cfg.f*S+18)+'" text-anchor="middle" font-size="14" fill="#495057">'+c+'</text>';
+  for(let r=1;r<=cfg.f;r++)s+='<text x="'+(L-8)+'" y="'+(cy(r)+5)+'" text-anchor="end" font-size="14" fill="#495057">'+r+'</text>';
+  if(cfg.meta)s+='<text x="'+cx(cfg.meta[0])+'" y="'+(cy(cfg.meta[1])+10)+'" text-anchor="middle" font-size="30" fill="#f59f00">★</text>';
+  if(states.length){
+    let pts=[];for(let i=0;i<=cur;i++){const p=states[i];const q=cx(p.x)+','+cy(p.y);if(!pts.length||pts[pts.length-1]!==q)pts.push(q);}
+    if(pts.length>1)s+='<polyline points="'+pts.join(' ')+'" fill="none" stroke="#4c6ef5" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" opacity=".55"/>';}
+  const p=states.length?states[cur]:{x:cfg.x,y:cfg.y,d:DIRS.indexOf(cfg.d),crash:false};
+  s+='<g transform="translate('+cx(p.x)+','+cy(p.y)+') rotate('+ANG[DIRS[p.d]]+')"><polygon points="0,-19 15,15 0,8 -15,15" fill="'+(p.crash?'#e03131':'#e8590c')+'" stroke="#fff" stroke-width="2"/></g>';
+  $('board').innerHTML=s+'</svg>';
+  const info=$('info');info.className='info';
+  const pos='Posición: columna <b>'+p.x+'</b>, fila <b>'+p.y+'</b> → casilla <b>('+p.x+', '+p.y+')</b> · mira '+DN[DIRS[p.d]];
+  if(!states.length){info.innerHTML='Escribe tu programa y pulsa «Ejecutar». '+pos;return;}
+  let extra='';
+  if(p.crash){info.className='info bad';extra='<br>💥 El robot se sale del tablero en la línea '+p.line+'. Revisa tu programa.';}
+  else if(cur===states.length-1){extra='<br>🏁 Fin del programa. Casilla final: <b>('+p.x+', '+p.y+')</b>, mirando '+DN[DIRS[p.d]]+'.';
+    if(cfg.meta){if(p.x===cfg.meta[0]&&p.y===cfg.meta[1]){info.className='info ok';extra+=' ⭐ ¡Has llegado a la meta!';}else extra+=' Todavía no has llegado a la meta ★ ('+cfg.meta[0]+', '+cfg.meta[1]+').';}}
+  else if(p.line)extra='<br>Última instrucción ejecutada: línea '+p.line+'.';
+  info.innerHTML=pos+extra;}
+function stop(){if(timer){clearInterval(timer);timer=null;}}
+function reset(){stop();states=[];cur=0;dirty=true;draw();}
+function compile(){try{states=simulate();cur=0;dirty=false;return true;}
+  catch(e){stop();states=[];$('info').className='info bad';$('info').textContent='⚠️ '+e.message;
+    $('board').querySelector&&draw_keep();return false;}}
+function draw_keep(){const m=$('info').textContent;draw();$('info').className='info bad';$('info').textContent=m;}
+function run(){stop();if(!compile())return;draw();
+  timer=setInterval(function(){if(cur>=states.length-1){stop();return;}cur++;draw();},380);}
+function step(){stop();if(dirty||!states.length){if(!compile())return;draw();return;}
+  if(cur<states.length-1){cur++;draw();}}
+function readCfg(){
+  const g=id=>Math.max(1,Math.min(12,parseInt($(id).value)||1));
+  const c=g('cc'),f=g('cf');
+  const x=Math.min(c,g('cx')),y=Math.min(f,g('cy'));
+  let meta=null;const mx=parseInt($('mx').value),my=parseInt($('my').value);
+  if(mx>=1&&my>=1&&mx<=c&&my<=f)meta=[mx,my];
+  cfg={c:c,f:f,x:x,y:y,d:$('cd').value,meta:meta};}
+function loadPreset(i){const p=P[i];
+  $('cc').value=p.c;$('cf').value=p.f;$('cx').value=p.x;$('cy').value=p.y;$('cd').value=p.d;
+  $('mx').value=p.meta?p.meta[0]:'';$('my').value=p.meta?p.meta[1]:'';
+  $('prog').value=p.prog;readCfg();reset();}
+function add(t){const a=$('prog');let v=a.value;if(v&&!v.endsWith('\n'))v+='\n';a.value=v+t;dirty=true;a.focus();}
+window.addEventListener('DOMContentLoaded',function(){
+  const sel=$('preset');P.forEach((p,i)=>{const o=document.createElement('option');o.value=i;o.textContent=p.name;sel.appendChild(o);});
+  sel.onchange=()=>loadPreset(+sel.value);
+  ['cc','cf','cx','cy','cd','mx','my'].forEach(id=>$(id).onchange=function(){readCfg();reset();});
+  $('prog').addEventListener('input',function(){dirty=true;});
+  $('prog').addEventListener('keydown',function(e){if(e.key==='Tab'){e.preventDefault();const a=e.target,s=a.selectionStart;a.value=a.value.slice(0,s)+'    '+a.value.slice(a.selectionEnd);a.selectionStart=a.selectionEnd=s+4;dirty=true;}});
+  $('bgo').onclick=run;$('bstep').onclick=step;$('breset').onclick=reset;
+  $('b1').onclick=()=>add('avanzar');$('b2').onclick=()=>add('girar izquierda');$('b3').onclick=()=>add('girar derecha');
+  $('b4').onclick=()=>add('repetir 2 veces\n    ');$('bclear').onclick=()=>{$('prog').value='';reset();};
+  loadPreset(0);});
+})();
+</script><div class="nav"><span><a href="s1.html">← Misión 1</a></span><span><a href="s2.html">Misión 2 →</a></span></div></main>
+<footer>Material para Computación y Robótica · 3º ESO · Basado en la Orden de 30 de mayo de 2023 (BOJA nº 104) · Licencia CC BY-SA<br>Tu XP se guarda solo en este navegador y no cuenta para la nota: la nota sale de los criterios.</footer>
+<div class="toast" id="toast"></div><script src="../assets/app.js"></script></body></html>
